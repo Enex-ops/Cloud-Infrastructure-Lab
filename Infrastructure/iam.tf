@@ -1,17 +1,24 @@
 resource "aws_iam_user" "terraform_user" {
   name = "gt3-cloud-terraform-user"
-  
+
 }
 
 resource "aws_iam_policy_attachment" "terraform_user_attachment" {
   name       = "gt3-cloud-terraform-user-attachment"
   users      = [aws_iam_user.terraform_user.name]
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
-  
+
+}
+
+resource "aws_iam_policy_attachment" "terraform_user_attachment_readonly" {
+  name       = "gt3-cloud-terraform-user-readonly-attachment"
+  users      = [aws_iam_user.terraform_user.name]
+  policy_arn = "arn:aws:iam::aws:policy/BudgetFullAccess"
+
 }
 
 resource "aws_iam_access_key" "terraform_user_key" {
-  user    = aws_iam_user.terraform_user.name
+  user = aws_iam_user.terraform_user.name
 }
 
 output "terraform_user_access_key_id" {
