@@ -10,10 +10,10 @@ resource "aws_iam_policy_attachment" "terraform_user_attachment" {
 
 }
 
-resource "aws_iam_policy_attachment" "terraform_user_attachment_readonly" {
-  name       = "gt3-cloud-terraform-user-readonly-attachment"
+resource "aws_iam_policy_attachment" "terraform_user_attachment_budget" {
+  name       = "gt3-cloud-terraform-user-budget-attachment"
   users      = [aws_iam_user.terraform_user.name]
-  policy_arn = "arn:aws:iam::aws:policy/BudgetFullAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AWSBudgetsReadOnlyAccess"
 
 }
 
