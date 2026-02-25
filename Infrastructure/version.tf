@@ -11,5 +11,5 @@ terraform {
 
 provider "aws" {
   region  = "ap-southeast-2"
-  profile = "cam"
+  profile = "gt3-cloud-terraform-user"
 }
