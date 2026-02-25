@@ -1,91 +1,89 @@
-# GT3 Cloud Architecture (Free-Tier Version)
+# GT3 Terraform Infrastructure
+
+## Overview
+
+This diagram represents the AWS infrastructure deployed via Terraform for the GT3 project.  
+All resources are **Terraform-managed**—no CDK or manual resources remain.
 
 ---
 
-## Edge / Global Services
+## Infrastructure Diagram (ASCII)
 
-- **Client**  
-  ↓
+      +---------------------+
+      |       Client        |
+      +---------+-----------+
+                |
+                v
+      +---------------------+
+      |    Route 53 DNS     |
+      +---------+-----------+
+                |
+                v
+      +---------------------+
+      |    CloudFront CDN   |
+      +---------+-----------+
+                |
+                v
+      +---------------------+
+      |      S3 Bucket      | <- Static assets / website files
+      +---------+-----------+
+                ^
+                |
+      +---------------------+
+      |   Application LB    |
+      +---------+-----------+
+                |
+      +---------+---------+
+      |       VPC         |
+      |------------------|
+      | Public Subnets    |
+      | Private Subnets   |
+      +------------------+
+      | Security Groups   |
+      +------------------+
+      | Lambda Functions  |
+      +---------+--------+
+                |
+                v
+      +---------------------+
+      |   API Gateway       |
+      +---------+-----------+
+                |
+                v
+      +---------------------+
+      |    DynamoDB Table   |
+      +---------------------+
+                ^
+                |
+      +---------------------+
+      | CloudWatch Metrics  |
+      +---------------------+
 
-- **Route 53** → DNS routing for your domain  
-  _Cost: ~$0.50/month per hosted zone (minimal)_  
-  ↓
-
-- **CloudFront** → CDN for static and dynamic content  
-  _Free Tier: 1TB data transfer out, 50GB storage per month_  
-  ↓
-
-- **S3** → Static assets storage, served via CloudFront  
-  _Free Tier: 5GB storage, 20k GET/PUT requests/month_  
-
-- **DynamoDB** → NoSQL database for application data  
-  _Free Tier: 25GB storage, 25 RCU/25 WCU_  
-
-- **IAM** → Roles, policies, and permissions  
-  _Free Tier: 100% free_
-
----
-
-## VPC / Networking
-
-- **VPC** → Main network for private and public resources  
-
-### Public Subnets
-- **Internet Gateway** → Connects public subnets to the Internet  
-
-### Private Subnets
-- **Lambda Functions** → Application logic, may access DynamoDB/S3  
-
-- **Security Groups** → Firewalls controlling inbound/outbound traffic  
-
-_Notes: Avoid NAT Gateway to stay free-tier safe_
-
----
-
-## Compute & Application Flow
-
-1. Client requests → Route 53 → CloudFront → API Gateway  
-
-2. API Gateway triggers Lambda functions  
-
-3. Lambda functions interact with:  
-   - DynamoDB (database)  
-   - **Optional:** ElastiCache (skip for free-tier)  
-
-4. Responses flow back → API Gateway → CloudFront → Client  
-
----
-
-## Monitoring & Observability
-
-- **CloudWatch** → Logs, metrics, and alarms for Lambda and API Gateway  
-  _Free Tier: 5GB logs/month, 10 custom metrics_
 
 ---
 
-## Estimated Monthly Cost (Free-Tier Safe)
+## Notes
 
-| Service            | Cost Estimate       |
-|-------------------|------------------|
-| Route 53           | ~$0.50            |
-| CloudFront         | $0 (within 1TB free) |
-| S3                 | $0 (within 5GB free) |
-| DynamoDB           | $0 (within free-tier) |
-| Lambda             | $0 (within 1M requests & 400k GB-sec) |
-| API Gateway        | $0 (1M REST API calls free) |
-| CloudWatch         | $0 (within free-tier) |
-| IAM                | $0                 |
-| **Total (typical)** | **~$0.50 / month** |
+- **VPC** contains compute resources (Lambda, API Gateway via private subnets)  
+- **S3 + CloudFront** handle public-facing static content  
+- **Route 53** points the domain to CloudFront  
+- **Lambda** connects through API Gateway to **DynamoDB**  
+- **CloudWatch** monitors Lambda, API Gateway, and DynamoDB  
+- **Security Groups** protect public and private resources  
 
 ---
 
-> Optional paid services (for enterprise-like diagrams, not deployed):  
-> - ElastiCache (~$15+)  
-> - Application Load Balancer (~$15+)  
-> - NAT Gateway (~$32+)  
-> - EC2 instances (if beyond free-tier t2.micro/t3.micro)
+## Terraform State Management
 
----
+The following resources **manage Terraform itself** (not part of application runtime):
+
+- **S3 bucket:** `terraform-state-145023112872` → stores remote state  
+- **DynamoDB table:** `terraform-locks` → prevents concurrent Terraform runs  
+
+> **Tip:** All infrastructure should now be fully Terraform-managed.  
+> No legacy CDK/CloudFormation stacks or buckets remain in the account.
+
+
 
 
 
