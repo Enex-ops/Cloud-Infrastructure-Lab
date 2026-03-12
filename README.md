@@ -15,6 +15,7 @@ All resources are **Terraform-managed** no manual resources remain.
 - **Core folder setup** although subject to change current folder structure allows for a clean vision of cloud infrastructure.
 - **IaM user** IaM user setup so that Terraform deployments don't come from the root user (more user roles to be created for demonstration) 
 - **VPC**
+- **Security Groups** protect public and private resources 
 
 ## To do:
  
@@ -22,8 +23,7 @@ All resources are **Terraform-managed** no manual resources remain.
 - **Route 53** points the domain to CloudFront  
 - **Lambda** connects through API Gateway to **DynamoDB**  
 - **CloudWatch** monitors Lambda, API Gateway, and DynamoDB  
-- **Security Groups** protect public and private resources  
-
+ 
 ---
 
 ## Terraform State Management (Complete)
