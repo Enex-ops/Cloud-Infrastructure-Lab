@@ -7,7 +7,7 @@ resource "aws_s3_bucket" "frontend_bucket" {
   }
 }
 
-resource "aws_dynamodb_table" "lab_example_bucket" {
+resource "aws_dynamodb_table" "lab_table" {
   name         = "lab-example-table"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
