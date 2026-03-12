@@ -14,10 +14,10 @@ All resources are **Terraform-managed** no manual resources remain.
 
 - **Core folder setup** although subject to change current folder structure allows for a clean vision of cloud infrastructure.
 - **IaM user** IaM user setup so that Terraform deployments don't come from the root user (more user roles to be created for demonstration) 
+- **VPC**
 
 ## To do:
-
-- **VPC** contains compute resources (Lambda, API Gateway via private subnets)  
+ 
 - **S3 + CloudFront** handle public-facing static content  
 - **Route 53** points the domain to CloudFront  
 - **Lambda** connects through API Gateway to **DynamoDB**  
