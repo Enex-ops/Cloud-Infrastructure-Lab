@@ -1,8 +1,8 @@
 resource "aws_s3_bucket" "frontend_bucket" {
-  bucket = "gt3-cloud-frontend-bucket"
+  bucket = "lab-cloud-frontend-bucket"
 
   tags = {
-    Name        = "GT3 Cloud Frontend Bucket"
+    Name        = "lab Cloud Frontend Bucket"
     Environment = "Production"
   }
 }

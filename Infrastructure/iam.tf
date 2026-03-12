@@ -1,17 +1,17 @@
 resource "aws_iam_user" "terraform_user" {
-  name = "gt3-cloud-terraform-user"
+  name = "lab-cloud-terraform-user"
 
 }
 
 resource "aws_iam_policy_attachment" "terraform_user_attachment" {
-  name       = "gt3-cloud-terraform-user-attachment"
+  name       = "lab-cloud-terraform-user-attachment"
   users      = [aws_iam_user.terraform_user.name]
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 
 }
 
 resource "aws_iam_policy_attachment" "terraform_user_attachment_budget" {
-  name       = "gt3-cloud-terraform-user-budget-attachment"
+  name       = "lab-cloud-terraform-user-budget-attachment"
   users      = [aws_iam_user.terraform_user.name]
   policy_arn = "arn:aws:iam::aws:policy/AWSBudgetsReadOnlyAccess"
 

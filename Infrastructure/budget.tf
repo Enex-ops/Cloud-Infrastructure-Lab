@@ -1,5 +1,5 @@
 resource "aws_budgets_budget" "monthly_cost" {
-  name         = "gt3-cloud-monthly-budget"
+  name         = "lab-cloud-monthly-budget"
   budget_type  = "COST"
   limit_amount = var.monthly_budget_limit
   limit_unit   = "USD"
