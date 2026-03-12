@@ -4,7 +4,7 @@ terraform {
     key            = "global/s3/terraform.tfstate"
     region         = "ap-southeast-2"
     encrypt        = true
-    use_lockfile = "true"
+    use_lockfile = true
   }
 }
 
