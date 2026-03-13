@@ -1,8 +1,8 @@
-resource "aws_s3_bucket" "frontend_bucket" {
-  bucket = "lab-cloud-frontend-bucket"
+resource "aws_s3_bucket" "staticweb_bucket" {
+  bucket = "lab-cloud-staticweb-bucket"
 
   tags = {
-    Name        = "lab Cloud Frontend Bucket"
+    Name        = "lab Static Web Bucket"
     Environment = "Production"
   }
 }
