@@ -33,10 +33,60 @@ resource "aws_s3_bucket_policy" "staticweb_bucket" {
 
 locals {
   s3_origin_id = "myS3Origin"
-  my_domain = "FoxResumeSupreme.com"
+  staticweb_domain = "FoxResumeSupreme.com"
 }
 
 data "aws_acm_certificate" "FoxResumeSupreme_com" {
-  domain   = local.my_domain
+  domain   = local.staticweb_domain
   statuses = ["ISSUED"] 
 }
+
+resource "aws_cloudfront_distribution" "s3_distribution" {
+  origin {
+    domain_name = aws_s3_bucket.staticweb_bucket.bucket_regional_domain_name
+    origin_id   = local.s3_origin_id
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.oai.cloudfront_access_identity_path
+    }
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "CloudFront Distribution for S3 Static Website"
+  default_root_object = "index.html"
+
+  default_cache_behavior {
+    target_origin_id       = local.s3_origin_id
+    viewer_protocol_policy = "redirect-to-https"
+
+    allowed_methods = ["GET", "HEAD", "OPTIONS"]
+    cached_methods  = ["GET", "HEAD"]
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = whitelist
+      locations        = ["AU"]
+    }
+  }
+
+  viewer_certificate {
+    acm_certificate_arn            = data.aws_acm_certificate.FoxResumeSupreme_com.arn
+    ssl_support_method             = "sni-only"
+    minimum_protocol_version       = "TLSv1.2_2021"
+  }
+}
+
+ data "aws_route53_zone" "staticweb_zone" {
+    name         = local.staticweb_domain
+    private_zone = false
+  }
