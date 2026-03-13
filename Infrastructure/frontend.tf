@@ -41,6 +41,11 @@ data "aws_acm_certificate" "FoxResumeSupreme_com" {
   statuses = ["ISSUED"] 
 }
 
+resource "aws_cloudfront_origin_access_identity" "oai" {
+  comment = "OAI for CloudFront to access S3 bucket"
+  
+}
+
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
     domain_name = aws_s3_bucket.staticweb_bucket.bucket_regional_domain_name
