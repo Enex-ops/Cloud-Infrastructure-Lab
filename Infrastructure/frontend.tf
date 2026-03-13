@@ -96,7 +96,10 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     private_zone = false
   }
 
+
+
 resource "aws_route53_record" "staticweb_record" {
+    for_each = aws_cloudfront_distribution.s3_distribution.aliases
     zone_id = data.aws_route53_zone.staticweb_zone.zone_id
     name    = local.staticweb_domain
     type    = "CNAME"
