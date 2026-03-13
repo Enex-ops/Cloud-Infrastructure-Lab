@@ -1,6 +1,6 @@
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
-    sid    = "AllowCloudFrontServicePrincipalReadWriteAccessToS3Bucket"
+    sid = "AllowCloudFrontServicePrincipalReadWriteAccessToS3Bucket"
     effect = "Allow"
 
     principals {
@@ -19,26 +19,26 @@ data "aws_iam_policy_document" "bucket_policy" {
     ]
 
     condition {
-      test     = "StringEquals"
+      test = "StringEquals"
       variable = "AWS:SourceArn"
-      values   = [aws_cloudfront_distribution.s3_distribution.arn]
+      values = [aws_cloudfront_distribution.s3_distribution.arn]
     }
   }
 }
 
 resource "aws_s3_bucket_policy" "staticweb_bucket" {
-  bucket = aws_s3_bucket.staticweb_bucket.id
-  policy = data.aws_iam_policy_document.bucket_policy.json
+    bucket = aws_s3_bucket.staticweb_bucket.id
+    policy = data.aws_iam_policy_document.bucket_policy.json
 }
 
 locals {
-  s3_origin_id     = "myS3Origin"
+  s3_origin_id = "myS3Origin"
   staticweb_domain = "FoxResumeSupreme.com"
 }
 
 data "aws_acm_certificate" "FoxResumeSupreme_com" {
   domain   = local.staticweb_domain
-  statuses = ["ISSUED"]
+  statuses = ["ISSUED"] 
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
@@ -80,13 +80,27 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = data.aws_acm_certificate.FoxResumeSupreme_com.arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+    acm_certificate_arn            = data.aws_acm_certificate.FoxResumeSupreme_com.arn
+    ssl_support_method             = "sni-only"
+    minimum_protocol_version       = "TLSv1.2_2021"
   }
 }
 
-data "aws_route53_zone" "staticweb_zone" {
-  name         = local.staticweb_domain
-  private_zone = false
+ data "aws_route53_zone" "staticweb_zone" {
+    name         = local.staticweb_domain
+    private_zone = false
+  }
+
+resource "aws_route53_record" "staticweb_record" {
+    zone_id = data.aws_route53_zone.staticweb_zone.zone_id
+    name    = local.staticweb_domain
+    type    = "CNAME"
+    ttl     = 300
+    records = [aws_cloudfront_distribution.s3_distribution.domain_name]
+
+    alias {
+      name = aws_cloudfront_distribution.s3_distribution.domain_name
+      zone_id = aws_cloudfront_distribution.s3_distribution_zone_id
+      evaluate_target_health = false
+    }
 }
