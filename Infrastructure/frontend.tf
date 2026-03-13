@@ -36,10 +36,10 @@ locals {
   staticweb_domain = "FoxResumeSupreme.com"
 }
 
-data "aws_acm_certificate" "FoxResumeSupreme_com" {
-  domain   = local.staticweb_domain
-  statuses = ["ISSUED"] 
-}
+//data "aws_acm_certificate" "FoxResumeSupreme_com" {
+ // domain   = local.staticweb_domain
+//  statuses = ["ISSUED"] 
+//}
 
 resource "aws_cloudfront_origin_access_identity" "oai" {
   comment = "OAI for CloudFront to access S3 bucket"
