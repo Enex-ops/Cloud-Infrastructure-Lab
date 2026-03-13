@@ -91,10 +91,10 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 }
 
- data "aws_route53_zone" "staticweb_zone" {
-    name         = local.staticweb_domain
-    private_zone = false
-  }
+// data "aws_route53_zone" "staticweb_zone" {
+//name         = local.staticweb_domain
+  //  private_zone = false
+ // }
 
 //resource "aws_route53_record" "staticweb_record" {
     //for_each = aws_cloudfront_distribution.s3_distribution.aliases
