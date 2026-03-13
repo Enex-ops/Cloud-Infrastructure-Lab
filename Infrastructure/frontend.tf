@@ -96,19 +96,17 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     private_zone = false
   }
 
+//resource "aws_route53_record" "staticweb_record" {
+    //for_each = aws_cloudfront_distribution.s3_distribution.aliases
+   // zone_id = data.aws_route53_zone.staticweb_zone.zone_id
+   // name    = local.staticweb_domain
+  //  type    = "CNAME"
+  //  ttl     = 300
+ //   records = [aws_cloudfront_distribution.s3_distribution.domain_name]
 
-
-resource "aws_route53_record" "staticweb_record" {
-    for_each = aws_cloudfront_distribution.s3_distribution.aliases
-    zone_id = data.aws_route53_zone.staticweb_zone.zone_id
-    name    = local.staticweb_domain
-    type    = "CNAME"
-    ttl     = 300
-    records = [aws_cloudfront_distribution.s3_distribution.domain_name]
-
-    alias {
-      name = aws_cloudfront_distribution.s3_distribution.domain_name
-      zone_id = aws_cloudfront_distribution.s3_distribution_zone_id
-      evaluate_target_health = false
-    }
-}
+  // alias {
+  //    name = aws_cloudfront_distribution.s3_distribution.domain_name
+ //    zone_id = aws_cloudfront_distribution.s3_distribution_zone_id
+  //    evaluate_target_health = false
+ //   }
+// }
