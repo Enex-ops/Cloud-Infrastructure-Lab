@@ -16,6 +16,12 @@ All resources are **Terraform-managed** no manual resources remain.
 - **IaM user** IaM user setup so that Terraform deployments don't come from the root user (more user roles to be created for demonstration) 
 - **VPC**
 - **Security Groups** protect public and private resources 
+- **Terraform Infrastructure as Code**
+- **AWS networking concepts**
+- **DNS management**
+- **ACM certificate automation**
+- **CloudFront CDN deployment**
+- **multi-region Terraform providers**
 
 ## To do:
  

@@ -33,10 +33,22 @@ resource "aws_s3_bucket_policy" "staticweb_bucket" {
 
 locals {
   s3_origin_id = "myS3Origin"
-  staticweb_domain = "FoxResumeSupreme.com"
+  staticweb_domain = "staticweb.com"
 }
 
-data "aws_acm_certificate" "FoxResumeSupreme_com" {
+resource "aws_acm_certificate" "staticweb_cert" {
+  provider = aws.us_east_1
+  validation_method = "DNS"
+  domain_name = local.staticweb_domain
+
+  tags = {
+    Name        = "lab Static Web Certificate"
+    Environment = "Production"
+  }
+}
+
+data "aws_acm_certificate" "staticweb_cert" {
+  provider = aws.us_east_1
   domain   = local.staticweb_domain
   statuses = ["ISSUED"] 
 }
@@ -80,14 +92,14 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   restrictions {
     geo_restriction {
       restriction_type = "whitelist"
-      locations        = ["AU"]
+      locations        = ["AU", "US"]
     }
   }
 
   viewer_certificate {
-    acm_certificate_arn            = data.aws_acm_certificate.FoxResumeSupreme_com.arn
-    ssl_support_method             = "sni-only"
-    minimum_protocol_version       = "TLSv1.2_2021"
+    acm_certificate_arn  = data.aws_acm_certificate.staticweb_cert.arn
+    ssl_support_method   = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 }
 
