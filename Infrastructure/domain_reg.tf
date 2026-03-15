@@ -1,5 +1,5 @@
 resource "aws_route53domains_domain" "camdev_domain" {
-  domain_name       = "camdevcloud.dev"
+  domain_name       = "camfox.cloud"
   duration_in_years = "1"
 
   admin_contact {
@@ -10,7 +10,7 @@ resource "aws_route53domains_domain" "camdev_domain" {
     email          = "campage1999@gmail.com"
     first_name     = "Cameron"
     last_name      = "Page"
-    phone_number   = "+61450316169"
+    phone_number   = "+61.450316169"
     state          = "SA"
     zip_code       = "5042"
   }
@@ -23,7 +23,7 @@ resource "aws_route53domains_domain" "camdev_domain" {
     email          = "campage1999@gmail.com"
     first_name     = "Cameron"
     last_name      = "Page"
-    phone_number   = "+61450316169"
+    phone_number   = "+61.450316169"
     state          = "SA"
     zip_code       = "5042"
   }
@@ -36,7 +36,7 @@ resource "aws_route53domains_domain" "camdev_domain" {
     email          = "campage1999@gmail.com"
     first_name     = "Cameron"
     last_name      = "Page"
-    phone_number   = "+61450316169"
+    phone_number   = "+61.450316169"
     state          = "SA"
     zip_code       = "5042" 
   }
