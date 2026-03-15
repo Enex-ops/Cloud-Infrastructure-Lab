@@ -9,7 +9,7 @@ resource "aws_vpc" "lab-vpc" { // Define a VPC resource named "lab-vpc"
 resource "aws_security_group" "allow_tls" { // Create a security group that allows inbound TLS traffic
   name        = "allow-tls"
   description = "Allow TLS inbound traffic"
-  vpc_id      = aws_vpc.lab-vpc.id 
+  vpc_id      = aws_vpc.lab-vpc.id
   ingress { // Allow inbound traffic on port 443 (HTTPS) from any source
     from_port   = 443
     to_port     = 443

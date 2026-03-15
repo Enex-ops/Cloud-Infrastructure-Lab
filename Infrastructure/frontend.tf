@@ -1,6 +1,6 @@
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
-    sid = "AllowCloudFrontServicePrincipalReadWriteAccessToS3Bucket"
+    sid    = "AllowCloudFrontServicePrincipalReadWriteAccessToS3Bucket"
     effect = "Allow"
 
     principals {
@@ -19,27 +19,27 @@ data "aws_iam_policy_document" "bucket_policy" {
     ]
 
     condition {
-      test = "StringEquals"
+      test     = "StringEquals"
       variable = "AWS:SourceArn"
-      values = [aws_cloudfront_distribution.s3_distribution.arn]
+      values   = [aws_cloudfront_distribution.s3_distribution.arn]
     }
   }
 }
 
 resource "aws_s3_bucket_policy" "staticweb_bucket" {
-    bucket = aws_s3_bucket.staticweb_bucket.id
-    policy = data.aws_iam_policy_document.bucket_policy.json
+  bucket = aws_s3_bucket.staticweb_bucket.id
+  policy = data.aws_iam_policy_document.bucket_policy.json
 }
 
 locals {
-  s3_origin_id = "myS3Origin"
+  s3_origin_id     = "myS3Origin"
   staticweb_domain = "staticweb.com"
 }
 
 resource "aws_acm_certificate" "staticweb_cert" {
-  provider = aws.us_east_1
+  provider          = aws.us_east_1
   validation_method = "DNS"
-  domain_name = local.staticweb_domain
+  domain_name       = local.staticweb_domain
 
   tags = {
     Name        = "lab Static Web Certificate"
@@ -50,12 +50,12 @@ resource "aws_acm_certificate" "staticweb_cert" {
 data "aws_acm_certificate" "staticweb_cert" {
   provider = aws.us_east_1
   domain   = local.staticweb_domain
-  statuses = ["ISSUED"] 
+  statuses = ["ISSUED"]
 }
 
 resource "aws_cloudfront_origin_access_identity" "oai" {
   comment = "OAI for CloudFront to access S3 bucket"
-  
+
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
@@ -97,28 +97,28 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   viewer_certificate {
-    acm_certificate_arn  = data.aws_acm_certificate.staticweb_cert.arn
-    ssl_support_method   = "sni-only"
+    acm_certificate_arn      = data.aws_acm_certificate.staticweb_cert.arn
+    ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
 }
 
 // data "aws_route53_zone" "staticweb_zone" {
 //name         = local.staticweb_domain
-  //  private_zone = false
- // }
+//  private_zone = false
+// }
 
 //resource "aws_route53_record" "staticweb_record" {
-    //for_each = aws_cloudfront_distribution.s3_distribution.aliases
-   // zone_id = data.aws_route53_zone.staticweb_zone.zone_id
-   // name    = local.staticweb_domain
-  //  type    = "CNAME"
-  //  ttl     = 300
- //   records = [aws_cloudfront_distribution.s3_distribution.domain_name]
+//for_each = aws_cloudfront_distribution.s3_distribution.aliases
+// zone_id = data.aws_route53_zone.staticweb_zone.zone_id
+// name    = local.staticweb_domain
+//  type    = "CNAME"
+//  ttl     = 300
+//   records = [aws_cloudfront_distribution.s3_distribution.domain_name]
 
-  // alias {
-  //    name = aws_cloudfront_distribution.s3_distribution.domain_name
- //    zone_id = aws_cloudfront_distribution.s3_distribution_zone_id
-  //    evaluate_target_health = false
- //   }
+// alias {
+//    name = aws_cloudfront_distribution.s3_distribution.domain_name
+//    zone_id = aws_cloudfront_distribution.s3_distribution_zone_id
+//    evaluate_target_health = false
+//   }
 // }
