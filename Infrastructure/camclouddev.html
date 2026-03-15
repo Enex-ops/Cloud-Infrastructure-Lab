@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cam Page | Cloud Engineer</title>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="camclouddev.css">
 </head>
 
 <body>
 
 <header class="hero">
     <div class="nav">
-        <h2 class="logo">🦊 CamCloud</h2>
+        <h2 class="logo">🦊 Cameron Page</h2>
         <nav>
             <a href="#projects">Projects</a>
             <a href="#skills">Skills</a>
@@ -20,14 +20,14 @@
     </div>
 
     <div class="hero-content">
-        <h1>Cloud Infrastructure Engineer</h1>
+        <h1>Developing and Aspiring Cloud Professional</h1>
         <p>Building scalable cloud systems with Terraform, AWS and automation.</p>
         <a class="cta" href="#projects">View Projects</a>
     </div>
 </header>
 
 
-<section id="projects" class="section">
+<section id="projects" class="section reveal">
     <h2>Projects</h2>
 
     <div class="cards">
@@ -51,7 +51,7 @@
 </section>
 
 
-<section id="skills" class="section light">
+<section id="skills" class="section light reveal">
     <h2>Skills</h2>
 
     <div class="skills">
@@ -67,7 +67,7 @@
 </section>
 
 
-<section id="contact" class="section">
+<section id="contact" class="section reveal">
     <h2>Contact</h2>
     <p>Interested in working together or discussing cloud infrastructure.</p>
 
@@ -83,5 +83,24 @@
     <p>© 2026 Cam Page | Built with Terraform + AWS</p>
 </footer>
 
+<script>
+    // Simple reveal on scroll animation
+    const reveals = document.querySelectorAll('.reveal');
+
+    function reveal() {
+        for (let i = 0; i < reveals.length; i++) {
+            const windowHeight = window.innerHeight;
+            const elementTop = reveals[i].getBoundingClientRect().top;
+            const elementVisible = 150;
+
+            if (elementTop < windowHeight - elementVisible) {
+                reveals[i].classList.add('active');
+            } else {
+                reveals[i].classList.remove('active');
+            }
+        }
+    }
+    window.addEventListener('scroll', reveal);
+</script>
 </body>
 </html>
