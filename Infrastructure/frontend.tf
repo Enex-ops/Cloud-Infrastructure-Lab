@@ -1,42 +1,42 @@
-data "aws_iam_policy_document" "bucket_policy" {
-  statement {
-    sid    = "AllowCloudFrontServicePrincipalReadWriteAccessToS3Bucket"
-    effect = "Allow"
+# data "aws_iam_policy_document" "bucket_policy" {
+  # statement {
+    # sid    = "AllowCloudFrontServicePrincipalReadWriteAccessToS3Bucket"
+    # effect = "Allow"
 
-    principals {
-      type        = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
-    }
+    # principals {
+      # type        = "Service"
+      #identifiers = ["cloudfront.amazonaws.com"]
+    #}
 
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:DeleteObject"
-    ]
+#     actions = [
+#       "s3:GetObject",
+#       "s3:PutObject",
+#       "s3:DeleteObject"
+#     ]
 
-    resources = [
-      "${aws_s3_bucket.staticweb_bucket.arn}/*"
-    ]
+#     resources = [
+#       "${aws_s3_bucket.staticweb_bucket.arn}/*"
+#     ]
 
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceArn"
-      values   = [aws_cloudfront_distribution.s3_distribution.arn]
-    }
-  }
-}
+#     condition {
+#       test     = "StringEquals"
+#       variable = "AWS:SourceArn"
+#       values   = [aws_cloudfront_distribution.s3_distribution.arn]
+#     }
+#   }
+# }
 
-resource "aws_s3_bucket_policy" "staticweb_bucket" {
-  bucket = aws_s3_bucket.staticweb_bucket.id
-  policy = data.aws_iam_policy_document.bucket_policy.json
-}
+# resource "aws_s3_bucket_policy" "staticweb_bucket" {
+#   bucket = aws_s3_bucket.staticweb_bucket.id
+#   policy = data.aws_iam_policy_document.bucket_policy.json
+# }
 
-locals {
-  s3_origin_id     = "myS3Origin"
-  staticweb_domain = "staticweb.com"
-}
+# locals {
+#   s3_origin_id     = "myS3Origin"
+#   staticweb_domain = "staticweb.com"
+# }
 
-# resource "aws_acm_certificate" "staticweb_cert" {
+# # resource "aws_acm_certificate" "staticweb_cert" {
 #   provider          = aws.us_east_1
 #   validation_method = "DNS"
 #   domain_name       = local.staticweb_domain
