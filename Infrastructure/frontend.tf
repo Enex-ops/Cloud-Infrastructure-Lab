@@ -49,7 +49,7 @@ locals {
 
 data "aws_acm_certificate" "staticweb_cert" {
   provider = aws.us_east_1
-  domain   = local.staticweb_domain
+  domain   = "camfox.cloud"
   statuses = ["ISSUED"]
 }
 
@@ -113,12 +113,11 @@ for_each = aws_cloudfront_distribution.s3_distribution.aliases
  zone_id = data.aws_route53_zone.staticweb_zone.zone_id
  name    = local.staticweb_domain
   type    = "CNAME"
-  ttl     = 300
    records = [aws_cloudfront_distribution.s3_distribution.domain_name]
 
  alias {
     name = aws_cloudfront_distribution.s3_distribution.domain_name
-    zone_id = aws_cloudfront_distribution.s3_distribution_zone_id
+    zone_id = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
     evaluate_target_health = false
    }
  }
