@@ -1,3 +1,16 @@
+variable "monthly_budget_limit" {
+  description = "The maximum budget limit for the month in USD."
+  type        = number
+  default     = 30
+}
+
+variable "alert_email" {
+  description = "The email address to send budget alerts to."
+  type        = string
+  default     = "campage1999@gmail.com"
+}
+
+
 resource "aws_budgets_budget" "monthly_cost" {
   name         = "lab-cloud-monthly-budget"
   budget_type  = "COST"

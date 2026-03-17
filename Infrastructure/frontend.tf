@@ -36,21 +36,22 @@ locals {
   staticweb_domain = "camfox.cloud"
 }
 
- resource "aws_acm_certificate" "staticweb_cert" {
+
+data "aws_acm_certificate" "staticweb_cert" {
+  provider    = aws.us_east_1
+  domain      = "camfox.cloud"
+  most_recent = "true"
+}
+
+resource "aws_acm_certificate" "staticweb_cert" {
   provider          = aws.us_east_1
   validation_method = "DNS"
-  domain_name       = local.staticweb_domain
+  domain_name       = "camfox.cloud"
 
   tags = {
     Name        = "lab Static Web Certificate"
     Environment = "Production"
   }
-}
-
-data "aws_acm_certificate" "staticweb_cert" {
-  provider = aws.us_east_1
-  domain   = "camfox.cloud"
-  statuses = ["ISSUED"]
 }
 
 resource "aws_cloudfront_origin_access_identity" "oai" {
@@ -103,21 +104,28 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 }
 
- data "aws_route53_zone" "staticweb_zone" {
+data "aws_route53_zone" "staticweb_zone" {
   name         = local.staticweb_domain
   private_zone = false
- }
+}
 
 resource "aws_route53_record" "staticweb_record" {
-for_each = aws_cloudfront_distribution.s3_distribution.aliases
- zone_id = data.aws_route53_zone.staticweb_zone.zone_id
- name    = local.staticweb_domain
-  type    = "CNAME"
-   records = [aws_cloudfront_distribution.s3_distribution.domain_name]
+  for_each = {
+    for robo in aws_acm_certificate.staticweb_cert.domain_validation_options : robo.domain_name => {
+      name   = robo.resource_record_name
+      type   = robo.resource_record_type
+      record = robo.resource_record_value
 
- alias {
-    name = aws_cloudfront_distribution.s3_distribution.domain_name
-    zone_id = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
-    evaluate_target_health = false
-   }
- }
+    }
+  }
+  zone_id = data.aws_route53_zone.staticweb_zone.zone_id
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = 60
+  records = [each.value.record]
+}
+
+resource "aws_acm_certificate_validation" "staticweb_cert_validation" {
+  provider        = aws.us_east_1
+  certificate_arn = aws_acm_certificate.staticweb_cert.arn
+}
