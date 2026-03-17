@@ -31,17 +31,22 @@ resource "aws_s3_bucket_policy" "staticweb_bucket" {
   policy = data.aws_iam_policy_document.bucket_policy.json
 }
 
+resource "aws_s3_object" "camfox_html" {
+  bucket = aws_s3_bucket.staticweb_bucket.id
+  key    = "camclouddev.html"
+  source = "camclouddev.html"
+}
+
+resource "aws_s3_object" "camfox_css" {
+  bucket = aws_s3_bucket.staticweb_bucket.id
+  key    = "camclouddev.css"
+  source = "camclouddev.css"
+}
+
 locals {
   s3_origin_id     = "myS3Origin"
   staticweb_domain = "camfox.cloud"
 }
-
-
-#  data "aws_acm_certificate" "staticweb_cert" {
-#   provider    = aws.us_east_1
-#   domain      = local.staticweb_domain
-#  most_recent = "true"
-# }
 
 resource "aws_acm_certificate" "staticweb_cert" {
   provider          = aws.us_east_1
@@ -104,28 +109,3 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
  }
 
-# data "aws_route53_zone" "staticweb_zone" {
-#   name         = local.staticweb_domain
-#   private_zone = false
-# }
-
-# resource "aws_route53_record" "staticweb_record" {
-#   for_each = {
-#     for robo in aws_acm_certificate.staticweb_cert.domain_validation_options : robo.domain_name => {
-#       name   = robo.resource_record_name
-#       type   = robo.resource_record_type
-#       record = robo.resource_record_value
-
-#     }
-#   }
-#   zone_id = data.aws_route53_zone.staticweb_zone.zone_id
-#   name    = each.value.name
-#   type    = each.value.type
-#   ttl     = 60
-#   records = [each.value.record]
-# }
-
-# resource "aws_acm_certificate_validation" "staticweb_cert_validation" {
-#   provider        = aws.us_east_1
-#   certificate_arn = aws_acm_certificate.staticweb_cert.arn
-# }
