@@ -108,4 +108,16 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
      minimum_protocol_version = "TLSv1.2_2021"
   }
  }
+ 
+ resource "aws_route53_zone" "staticweb_zone" {
+  name = local.staticweb_domain
+ }
+
+ resource "aws_route53_record" "staticweb_record" {
+  zone_id = aws_route53_zone.staticweb_zone.zone_id
+  name    = local.staticweb_domain
+  type    = "CNAME"
+  ttl     = 300
+  records = [aws_cloudfront_distribution.s3_distribution.domain_name]
+ }
 
