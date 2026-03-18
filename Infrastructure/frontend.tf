@@ -34,10 +34,6 @@ resource "aws_cloudfront_origin_access_control" "staticweb_oac" {
   origin_access_control_origin_type = "s3"
 }
 
-resource "aws_cloudfront_origin_access_identity" "oai" {
-  comment = "OAI for CloudFront to access S3 bucket"
-}
-
 resource "aws_s3_bucket_policy" "staticweb_bucket" {
   bucket = aws_s3_bucket.staticweb_bucket.id
   policy = data.aws_iam_policy_document.bucket_policy.json
@@ -75,10 +71,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
     domain_name = aws_s3_bucket.staticweb_bucket.bucket_regional_domain_name
     origin_id   = local.s3_origin_id
-
-    s3_origin_config {
-      origin_access_identity = "origin-access-identity/cloudfront/${aws_cloudfront_origin_access_identity.oai.id}"
-    }
+    origin_access_control_id = aws_cloudfront_origin_access_control.staticweb_oac.id
   }
 
   enabled             = true
@@ -101,6 +94,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       }
     }
   }
+
+  aliases = [ "camfox.cloud" ]
 
   restrictions {
     geo_restriction {
