@@ -1,6 +1,6 @@
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
-    sid    = "AllowCloudFrontServicePrincipalReadWriteAccessToS3Bucket"
+    sid    = "AllowCloudFrontAccess"
     effect = "Allow"
 
     principals {
@@ -26,6 +26,18 @@ data "aws_iam_policy_document" "bucket_policy" {
   }
 }
 
+resource "aws_cloudfront_origin_access_control" "staticweb_oac" {
+  name = "staticweb-oac"
+  description = "Origin Access Control for CloudFront to access S3 bucket"
+  signing_behavior = "always"
+  signing_protocol = "sigv4"
+  origin_access_control_origin_type = "s3"
+}
+
+resource "aws_cloudfront_origin_access_identity" "oai" {
+  comment = "OAI for CloudFront to access S3 bucket"
+}
+
 resource "aws_s3_bucket_policy" "staticweb_bucket" {
   bucket = aws_s3_bucket.staticweb_bucket.id
   policy = data.aws_iam_policy_document.bucket_policy.json
@@ -44,7 +56,7 @@ resource "aws_s3_object" "camfox_css" {
 }
 
 locals {
-  s3_origin_id     = "myS3Origin"
+  s3_origin_id     = "S3-staticweb-origin"
   staticweb_domain = "camfox.cloud"
 }
 
@@ -59,18 +71,13 @@ resource "aws_acm_certificate" "staticweb_cert" {
   }
 }
 
-resource "aws_cloudfront_origin_access_identity" "oai" {
-  comment = "OAI for CloudFront to access S3 bucket"
-
-}
-
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
     domain_name = aws_s3_bucket.staticweb_bucket.bucket_regional_domain_name
     origin_id   = local.s3_origin_id
 
     s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.oai.cloudfront_access_identity_path
+      origin_access_identity = "origin-access-identity/cloudfront/${aws_cloudfront_origin_access_identity.oai.id}"
     }
   }
 
