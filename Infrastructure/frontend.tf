@@ -115,7 +115,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
  resource "aws_route53_record" "staticweb_record" {
   zone_id = aws_route53_zone.staticweb_zone.zone_id
-  name    = local.staticweb_domain
+  name    = "camfox.cloud"
   type    = "A"
  
  alias {

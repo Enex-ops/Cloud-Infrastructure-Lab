@@ -22,12 +22,11 @@ All resources are **Terraform-managed** no manual resources remain.
 - **ACM certificate automation**
 - **CloudFront CDN deployment**
 - **multi-region Terraform providers**
+- **S3 + CloudFront** handle public-facing static content  
+- **Route 53** points the domain to CloudFront
 
 ## To do:
  
-- **S3 + CloudFront** handle public-facing static content  
-- **Route 53** points the domain to CloudFront  
-- **Lambda** connects through API Gateway to **DynamoDB**  
 - **CloudWatch** monitors Lambda, API Gateway, and DynamoDB  
  
 ---
