@@ -56,7 +56,7 @@ locals {
   staticweb_domain = "camfox.cloud"
 }
 
-resource "aws_acm_certificate" "staticweb_cert" {
+resource "aws_acm_certificate" "staticweb_acm_cert" {
   provider          = aws.us_east_1
   validation_method = "DNS"
   domain_name       = "camfox.cloud"
@@ -64,7 +64,15 @@ resource "aws_acm_certificate" "staticweb_cert" {
   tags = {
     Name        = "lab Static Web Certificate"
     Environment = "Production"
+    
   }
+}
+
+resource "aws_acm_certificate_validation" "staticweb_acm_validation" {
+  certificate_arn = aws_acm_certificate.staticweb_acm_cert.arn
+  validation_record_fqdns = [
+    aws_route53_record.staticweb_record.fqdn
+  ]
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
@@ -105,7 +113,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
    viewer_certificate {
-     cloudfront_default_certificate = true
+     cloudfront_default_certificate = false
+     acm_certificate_arn            = aws_acm_certificate.staticweb_acm_cert.arn
      ssl_support_method       = "sni-only"
      minimum_protocol_version = "TLSv1.2_2021"
   }
@@ -118,7 +127,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
  resource "aws_route53_record" "staticweb_record" {
   zone_id = aws_route53_zone.staticweb_zone.zone_id
   name    = "camfox.cloud"
-  type    = "A"
+  type    = "CNAME"
+  records = "${aws_cloudfront_distribution.s3_distribution.domain_name}"
  
  alias {
     name                   = aws_cloudfront_distribution.s3_distribution.domain_name
