@@ -27,10 +27,10 @@ data "aws_iam_policy_document" "bucket_policy" {
 }
 
 resource "aws_cloudfront_origin_access_control" "staticweb_oac" {
-  name = "staticweb-oac"
-  description = "Origin Access Control for CloudFront to access S3 bucket"
-  signing_behavior = "always"
-  signing_protocol = "sigv4"
+  name                              = "staticweb-oac"
+  description                       = "Origin Access Control for CloudFront to access S3 bucket"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
   origin_access_control_origin_type = "s3"
 }
 
@@ -56,29 +56,34 @@ locals {
   staticweb_domain = "camfox.cloud"
 }
 
-resource "aws_acm_certificate" "staticweb_acm_cert" {
+resource "aws_acm_certificate" "staticweb_acm_certificate" {
   provider          = aws.us_east_1
   validation_method = "DNS"
   domain_name       = "camfox.cloud"
+  subject_alternative_names = ["www.camfox.cloud"]
+
+lifecycle {
+  create_before_destroy = true
+}
 
   tags = {
     Name        = "lab Static Web Certificate"
     Environment = "Production"
-    
+
   }
 }
 
 resource "aws_acm_certificate_validation" "staticweb_acm_validation" {
-  certificate_arn = aws_acm_certificate.staticweb_acm_cert.arn
+  certificate_arn = "arn:aws:acm:us-east-1:145023112872:certificate/dcac2edb-4a5c-45d9-8bc8-a2a8d7206729"
   validation_record_fqdns = [
-    aws_route53_record.staticweb_record.fqdn
+    for record in awsaws_route53_record.staticweb_record : record.fqdn
   ]
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
-    domain_name = aws_s3_bucket.staticweb_bucket.bucket_regional_domain_name
-    origin_id   = local.s3_origin_id
+    domain_name              = aws_s3_bucket.staticweb_bucket.bucket_regional_domain_name
+    origin_id                = local.s3_origin_id
     origin_access_control_id = aws_cloudfront_origin_access_control.staticweb_oac.id
   }
 
@@ -103,7 +108,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     }
   }
 
-  aliases = [ "camfox.cloud" ]
+  aliases = ["camfox.cloud"]
 
   restrictions {
     geo_restriction {
@@ -112,28 +117,31 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     }
   }
 
-   viewer_certificate {
-     cloudfront_default_certificate = false
-     acm_certificate_arn            = aws_acm_certificate.staticweb_acm_cert.arn
-     ssl_support_method       = "sni-only"
-     minimum_protocol_version = "TLSv1.2_2021"
-  }
- }
- 
- resource "aws_route53_zone" "staticweb_zone" {
-  name = local.staticweb_domain
- }
+  depends_on = [ aws_acm_certificate.staticweb_acm_certificate ]
 
- resource "aws_route53_record" "staticweb_record" {
-  zone_id = aws_route53_zone.staticweb_zone.zone_id
-  name    = "camfox.cloud"
-  type    = "CNAME"
-  records = "${aws_cloudfront_distribution.s3_distribution.domain_name}"
- 
- alias {
-    name                   = aws_cloudfront_distribution.s3_distribution.domain_name
-    zone_id                = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
-    evaluate_target_health = false
+  viewer_certificate {
+    acm_certificate_arn      = "arn:aws:acm:us-east-1:145023112872:certificate/dcac2edb-4a5c-45d9-8bc8-a2a8d7206729"
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
- }
+}
+
+resource "aws_route53_zone" "staticweb_zone" {
+  name = local.staticweb_domain
+}
+
+resource "aws_route53_record" "staticweb_record" {
+  for_each = {
+    for dvo in awaws_acm_certificate.staticweb_acm_certificate.domain_validation_options : dvo.domain_name => dvo
+    }
+  
+  name    = aws_cloudfront_distribution.s3_distribution.domain_name
+  zone_id = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
+  type = "CNAME"
+}
+
+
+
+
+
 
