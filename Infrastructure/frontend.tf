@@ -76,7 +76,7 @@ lifecycle {
 resource "aws_acm_certificate_validation" "staticweb_acm_validation" {
   certificate_arn = "arn:aws:acm:us-east-1:145023112872:certificate/dcac2edb-4a5c-45d9-8bc8-a2a8d7206729"
   validation_record_fqdns = [
-    for record in awsaws_route53_record.staticweb_record : record.fqdn
+    aws_route53_record.staticweb_validation.fqdn
   ]
 }
 
@@ -131,13 +131,14 @@ resource "aws_route53_zone" "staticweb_zone" {
 }
 
 resource "aws_route53_record" "staticweb_record" {
-  for_each = {
-    for dvo in awaws_acm_certificate.staticweb_acm_certificate.domain_validation_options : dvo.domain_name => dvo
-    }
-  
-  name    = aws_cloudfront_distribution.s3_distribution.domain_name
-  zone_id = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
-  type = "CNAME"
+  zone_id = aws_route53_zone.staticweb_zone.zone_id
+  name    = local.staticweb_domain
+  type    = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.s3_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
+    evaluate_target_health = false
+  }
 }
 
 
