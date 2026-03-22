@@ -74,10 +74,11 @@ lifecycle {
 }
 
 resource "aws_acm_certificate_validation" "staticweb_acm_validation" {
-  certificate_arn = "arn:aws:acm:us-east-1:145023112872:certificate/dcac2edb-4a5c-45d9-8bc8-a2a8d7206729"
-  validation_record_fqdns = [
-    aws_route53_record.staticweb_validation.fqdn
-  ]
+  provider = aws.us_east_1
+  certificate_arn = aws_acm_certificate.staticweb_acm_certificate.arn
+  /* validation_record_fqdns = [
+    aws_route53_record.staticweb_record.fqdn
+  ] */
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
@@ -117,10 +118,10 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     }
   }
 
-  depends_on = [ aws_acm_certificate.staticweb_acm_certificate ]
+  depends_on = [ aws_acm_certificate_validation.staticweb_acm_validation ]
 
   viewer_certificate {
-    acm_certificate_arn      = "arn:aws:acm:us-east-1:145023112872:certificate/dcac2edb-4a5c-45d9-8bc8-a2a8d7206729"
+    acm_certificate_arn      = aws_acm_certificate.staticweb_acm_certificate.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
@@ -130,7 +131,7 @@ resource "aws_route53_zone" "staticweb_zone" {
   name = local.staticweb_domain
 }
 
-resource "aws_route53_record" "staticweb_record" {
+/* resource "aws_route53_record" "staticweb_record" {
   zone_id = aws_route53_zone.staticweb_zone.zone_id
   name    = local.staticweb_domain
   type    = "A"
@@ -139,7 +140,7 @@ resource "aws_route53_record" "staticweb_record" {
     zone_id                = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
     evaluate_target_health = false
   }
-}
+} */
 
 
 
